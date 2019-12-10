@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+
+<script>
+	// Function to create linear samples
+	function linspace(x_min=-1, x_max=1, x_N=101){
+		return Array(x_N).fill().map((_,i) => i * (x_max - x_min) / (x_N-1) + x_min);
+	}
+
+	// Function to create the whole set of tomo-samples of the function
+	function generate_isograms(f, x_samples=linspace(-1,1,101), y_samples=linspace(-1,1,21), z_max=1, px_ratio=150){
+		for (y_sample of y_samples){
+			generate_svg((x)=> f(x,y_sample), x_samples, z_max, px_ratio)
+		}
+	}
+
+	// Function to create an svg plot
+	function generate_svg(f, x_samples=linspace(), z_max=1, px_ratio=200){
+		// Set up data
+		y_samples = x_samples.map((v,i) => f(v));
+		y_samples = y_samples.map((v,i) => isNaN(v)?0:v);
+		var data = x_samples.map((v,i) => ({'x':v,'y':y_samples[i]}));
+	
+		// Setup ranges
+		var x_min = x_samples[0], x_max = x_samples[x_samples.length-1];
+		var x_range = x_max-x_min, z_range = z_max-0;
+		var width = x_range*px_ratio, height = z_range*px_ratio, full_height = height+50;
+		
+		var stroke_width = 2;
+		
+		//Setup the canvas
+		var svg = d3.select("#my_dataviz")
+			.append("svg")
+			.attr("width", width)
+			.attr("height", full_height);
+		var plot = svg.append("g");
+		
+		// Set up the fram
+		svg.append("rect")
+			.attr("x", stroke_width/2)
+			.attr("y", stroke_width/2)
+			.attr("height", full_height-stroke_width)
+			.attr("width", width-stroke_width)
+			.style("stroke", "black")
+			.style("fill", "none")
+			.style("stroke-width", stroke_width);
+		plot.append("rect")
+			.attr("x", stroke_width/2)
+			.attr("y", stroke_width/2)
+			.attr("height", height-stroke_width)
+			.attr("width", width-stroke_width)
+			.style("stroke", "black")
+			.style("fill", "none")
+			.style("stroke-width", stroke_width);
+
+		// X axis
+		var x = d3.scaleLinear()
+			.domain([x_min, x_max])
+			.range([ 0, width]);
+		plot.append("g")
+			.attr("transform", "translate(0," + height + ")")
+			.call(d3.axisBottom(x));
+
+		// X axis
+		var x = d3.scaleLinear()
+			.domain([x_min, x_max])
+			.range([ 0, width]);
+		plot.append("g")
+			.attr("transform", "translate(0," + height + ")")
+			.call(d3.axisBottom(x));
+		// Y axis
+		var y = d3.scaleLinear()
+			.domain([0, z_max])
+			.range([height, 0]);
+		plot.append("g")
+			.call(d3.axisLeft(y));
+
+		// Add the line
+		plot.append("path")
+			.datum(data)
+			.attr("fill", "none")
+			.attr("stroke", "black")
+			.attr("stroke-width", stroke_width)
+			.attr("d", d3.line()
+				.x((d) => x(d.x))
+				.y((d) => y(d.y)));
+	}
+
+	// Read in the parameters
+	var params = new URLSearchParams(window.location.search);
+	var f_string = params.get('f');
+	
+	var f = (x,y) => eval(f_string);
+	var x_min = parseFloat(params.get('x_min')), x_max = parseFloat(params.get('x_max')), x_N = parseInt(params.get('x_N'));
+	var y_min = parseFloat(params.get('y_min')), y_max = parseFloat(params.get('y_max')), y_samples = parseInt(params.get('y_samples'));
+	var z_max = parseFloat(params.get('z_max'));
+	var px_ratio = parseFloat(params.get('px_ratio'));
+	
+	console.log(f)
+	console.log(x_min)
+	console.log(x_max)
+	console.log(x_N)
+	console.log(y_min)
+	console.log(y_max)
+	console.log(y_samples)
+	console.log(z_max)
+	console.log(px_ratio)
+
+	// Generate the isograms
+	generate_isograms(f, linspace(x_min,x_max,x_N), linspace(y_min,y_max,y_samples), z_max, px_ratio)
+
+</script>

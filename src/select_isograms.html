@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Isogram Printer</h2>
+
+<h3>Description</h3>
+<p>
+This tool will render a page containing the isograms of a function in SVG format.<br>
+The function must be a 2D manifold in 3D space of the form z=f(x,y).<br>
+The isograms will be with respect to fixed y.
+</p>
+
+<h3>Instructions</h3>
+<p>
+<ol type="1">
+<li>Write your function z=f(x,y) in JavaScript.</li>
+<li>Enter the domain over which you would like it mapped. Note that the isograms will have fixed y.</li>
+<li>Select the domain to pixels ratio. It is recommended to use 300/x_range</li>
+<li>Click "Render Isograms" to open a new page with the isogram SVGs</li>
+<li>Print the page to get them.</li>
+</ol>
+</p>
+
+<h3>Inputs</h3>
+<form action="/render_isograms.html" method="get" target="_blank">
+	f(x,y) =
+	<input type="text" size="100" name="f" value="Math.sin(10*Math.sqrt(x*x+y*y))/(10*Math.sqrt(x*x+y*y))">
+	<br>
+	x_range:
+	x_min =
+	<input type="text" size="4" name="x_min" value="-1">
+	x_max =
+	<input type="text" size="4" name="x_max" value="1">
+	x_samples =
+	<input type="text" size="4" name="x_N" value="1001">
+	<br>
+	y_range:
+	y_min =
+	<input type="text" size="4" name="y_min" value="-1">
+	y_max =
+	<input type="text" size="4" name="y_max" value="1">
+	y_samples =
+	<input type="text" size="4" name="y_samples" value="21">
+	<br>
+	z_range: z_min = 0 z_max =
+	<input type="text" size="4" name="z_max" value="1">
+	<br>
+	domain to pixels ratio =
+	<input type="text" size="4" name="px_ratio" value="150">
+  <br><br>
+  <input type="submit" value="Render Isograms">
+</form>
+
+</body>
+</html>
