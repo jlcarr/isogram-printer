@@ -22,10 +22,17 @@ The isograms will be with respect to fixed y.
 </ol>
 </p>
 
+<h3>Examples</h3>
+<ul>
+<li><b>Half Sphere</b>: Math.sqrt(1-x*x-y*y)</li>
+<li><b>Half Torus</b>: Math.sqrt(0.25*0.25-Math.pow(0.75-Math.sqrt(x*x+y*y),2))</li>
+<li><b>Radial Sinc</b>: 0.75*Math.sin(10*Math.sqrt(x*x+y*y)+0.00000001)/(10*Math.sqrt(x*x+y*y)+0.00000001)+0.25</li>
+</ul>
+
 <h3>Inputs</h3>
 <form action="/render_isograms.html" method="get" target="_blank">
 	f(x,y) =
-	<input type="text" size="100" name="f" value="Math.sin(10*Math.sqrt(x*x+y*y))/(10*Math.sqrt(x*x+y*y))">
+	<input type="text" size="100" name="f" value="Math.sqrt(0.25*0.25-Math.pow(0.75-Math.sqrt(x*x+y*y),2))">
 	<br>
 	x_range:
 	x_min =
@@ -51,6 +58,7 @@ The isograms will be with respect to fixed y.
   <br><br>
   <input type="submit" value="Render Isograms">
 </form>
+
 
 </body>
 </html>

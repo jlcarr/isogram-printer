@@ -17,23 +17,29 @@
 	// Function to create the whole set of tomo-samples of the function
 	function generate_isograms(f, x_samples=linspace(-1,1,101), y_samples=linspace(-1,1,21), z_max=1, px_ratio=150){
 		for (y_sample of y_samples){
-			generate_svg((x)=> f(x,y_sample), x_samples, z_max, px_ratio)
+			console.log(y_sample);
+			generate_svg((x)=> f(x,y_sample), x_samples, z_max, px_ratio);
 		}
+		generate_tab(y_samples, px_ratio);
+		generate_tab(y_samples, px_ratio);
 	}
 
 	// Function to create an svg plot
-	function generate_svg(f, x_samples=linspace(), z_max=1, px_ratio=200){
+	function generate_svg(f, x_samples=linspace(), z_max=1, px_ratio=150){
+		// Draw params
+		var stroke_width = 2;
+		var tab_size = 50;
+		
 		// Set up data
-		y_samples = x_samples.map((v,i) => f(v));
-		y_samples = y_samples.map((v,i) => isNaN(v)?0:v);
+		y_samples = x_samples.map(v => f(v));
+		y_samples = y_samples.map(v => isNaN(v)?0:v);
 		var data = x_samples.map((v,i) => ({'x':v,'y':y_samples[i]}));
 	
 		// Setup ranges
 		var x_min = x_samples[0], x_max = x_samples[x_samples.length-1];
 		var x_range = x_max-x_min, z_range = z_max-0;
-		var width = x_range*px_ratio, height = z_range*px_ratio, full_height = height+50;
+		var width = x_range*px_ratio, height = z_range*px_ratio, full_height = height+tab_size;
 		
-		var stroke_width = 2;
 		
 		//Setup the canvas
 		var svg = d3.select("#my_dataviz")
@@ -42,7 +48,7 @@
 			.attr("height", full_height);
 		var plot = svg.append("g");
 		
-		// Set up the fram
+		// Set up the fram2
 		svg.append("rect")
 			.attr("x", stroke_width/2)
 			.attr("y", stroke_width/2)
@@ -51,7 +57,7 @@
 			.style("stroke", "black")
 			.style("fill", "none")
 			.style("stroke-width", stroke_width);
-		plot.append("rect")
+		svg.append("rect")
 			.attr("x", stroke_width/2)
 			.attr("y", stroke_width/2)
 			.attr("height", height-stroke_width)
@@ -59,28 +65,51 @@
 			.style("stroke", "black")
 			.style("fill", "none")
 			.style("stroke-width", stroke_width);
+		// Frame ClipPath
+		plot.append("defs").append("clipPath")
+			.attr("id", "frame_clip")
+			.append("rect")
+			.attr("width", width)
+			.attr("height", height);
+		plot.attr("clip-path", "url(#frame_clip)");
+		
+		// Set up tab
+		svg.append("path")
+			.datum([
+				{'x':width*0.1,'y':full_height},
+				{'x':width*0.1,'y':full_height-tab_size/2}
+			])
+			.attr("stroke", "black")
+			.attr("stroke-width", stroke_width)
+			.attr("d", d3.line()
+				.x((d) => d.x)
+				.y((d) => d.y));
+		svg.append("path")
+			.datum([
+				{'x':width*0.9,'y':full_height},
+				{'x':width*0.9,'y':full_height-tab_size/2}
+			])
+			.attr("stroke", "black")
+			.attr("stroke-width", stroke_width)
+			.attr("d", d3.line()
+				.x((d) => d.x)
+				.y((d) => d.y));
 
 		// X axis
 		var x = d3.scaleLinear()
 			.domain([x_min, x_max])
 			.range([ 0, width]);
-		plot.append("g")
-			.attr("transform", "translate(0," + height + ")")
-			.call(d3.axisBottom(x));
+		//plot.append("g")
+		//	.attr("transform", "translate(0," + height + ")")
+		//	.call(d3.axisBottom(x));
 
-		// X axis
-		var x = d3.scaleLinear()
-			.domain([x_min, x_max])
-			.range([ 0, width]);
-		plot.append("g")
-			.attr("transform", "translate(0," + height + ")")
-			.call(d3.axisBottom(x));
 		// Y axis
 		var y = d3.scaleLinear()
 			.domain([0, z_max])
 			.range([height, 0]);
-		plot.append("g")
-			.call(d3.axisLeft(y));
+		//plot.append("g")
+		//	.call(d3.axisLeft(y));
+		
 
 		// Add the line
 		plot.append("path")
@@ -93,25 +122,64 @@
 				.y((d) => y(d.y)));
 	}
 
+	// Function to generated the holding tabs
+	function generate_tab(y_samples=linspace(), px_ratio=150){
+		// Create the tab holders
+		// Draw params
+		var stroke_width = 2;
+		var tab_size = 50;
+	
+		// Setup ranges
+		var y_min = y_samples[0], y_max = y_samples[y_samples.length-1];
+		var y_range = y_max-y_min;
+		var width = y_range*px_ratio, height = tab_size;
+		
+		var svg = d3.select("#my_dataviz")
+			.append("svg")
+			.attr("width", width)
+			.attr("height", height);
+		svg.append("rect")
+			.attr("x", stroke_width/2)
+			.attr("y", stroke_width/2)
+			.attr("height", height-stroke_width)
+			.attr("width", width-stroke_width)
+			.style("stroke", "black")
+			.style("fill", "none")
+			.style("stroke-width", stroke_width);
+		for (i_y=0; i_y<y_samples.length; i_y++){
+			svg.append("path")
+				.datum([
+					{'x':width*(i_y+0.5)/y_samples.length,'y':height},
+					{'x':width*(i_y+0.5)/y_samples.length,'y':height/2}
+				])
+				.attr("stroke", "black")
+				.attr("stroke-width", stroke_width)
+				.attr("d", d3.line()
+					.x((d) => d.x)
+					.y((d) => d.y));
+		}
+	}
+
 	// Read in the parameters
 	var params = new URLSearchParams(window.location.search);
 	var f_string = params.get('f');
 	
 	var f = (x,y) => eval(f_string);
+	
 	var x_min = parseFloat(params.get('x_min')), x_max = parseFloat(params.get('x_max')), x_N = parseInt(params.get('x_N'));
 	var y_min = parseFloat(params.get('y_min')), y_max = parseFloat(params.get('y_max')), y_samples = parseInt(params.get('y_samples'));
 	var z_max = parseFloat(params.get('z_max'));
 	var px_ratio = parseFloat(params.get('px_ratio'));
 	
-	console.log(f)
-	console.log(x_min)
-	console.log(x_max)
-	console.log(x_N)
-	console.log(y_min)
-	console.log(y_max)
-	console.log(y_samples)
-	console.log(z_max)
-	console.log(px_ratio)
+	console.log(f);
+	console.log(x_min);
+	console.log(x_max);
+	console.log(x_N);
+	console.log(y_min);
+	console.log(y_max);
+	console.log(y_samples);
+	console.log(z_max);
+	console.log(px_ratio);
 
 	// Generate the isograms
 	generate_isograms(f, linspace(x_min,x_max,x_N), linspace(y_min,y_max,y_samples), z_max, px_ratio)
