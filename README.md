@@ -1,7 +1,9 @@
 # isogram_printer
 An Javascript project to render 3D function isograms in SVG with HTML UI  
 
-See this project in action online: https://jcarr.ca/isogram-printer
+See the project in action [here](https://jcarr.ca/isogram-printer).  
+
+![Isogram Example](https://i1.lensdump.com/i/jvYa5a.png)
 
 ## What is an Isogram?
 An isogram is a plot of a multivariate function in which one or more variables are held constant. One can think of this as a plot of a "slice" of that function.  
